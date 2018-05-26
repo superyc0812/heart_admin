@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xupt.dao_admin.AdminForumDao">
+    <resultMap type="AdminForum" id="BaseResultMap">
+        <id column="forum_id" jdbcType="INTEGER" property="forum_id"/>
+        <result column="nickname" jdbcType="INTEGER" property="nickname"/>
+        <result column="publish_date" jdbcType="VARCHAR" property="publish_date"/>
+        <result column="forum_type_id" jdbcType="INTEGER" property="typeId"/>
+        <result column="forum_type_name" jdbcType="VARCHAR" property="typeName"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="content" jdbcType="VARCHAR" property="content"/>
+    </resultMap>
+
+    <resultMap type="AdminForumType" id="rm">
+        <id column="forum_type_id" jdbcType="INTEGER" property="forum_label_id"/>
+        <result column="forum_type_name" jdbcType="VARCHAR" property="forum_label_name"/>
+        <result column="forum_type_status" jdbcType="BOOLEAN" property="forum_label_status"/>
+    </resultMap>
+
+    <select id="getForumList" parameterType="AdminPageBean" resultMap="BaseResultMap">
+        SELECT f.forum_id,tp.forum_type_id,tp.forum_type_name,f.user_id,f.publish_date,
+            f.title,f.content,u.nickname
+            FROM forum f
+            LEFT OUTER JOIN forum_type tp
+            ON f.forum_type_id = tp.forum_type_id
+            LEFT OUTER JOIN USER u
+            ON u.user_id = f.user_id
+        <if test="start!=null and pageSize!=null">
+            limit #{start},#{pageSize}
+        </if>
+    </select>
+
+    <select id="getTotalForums" resultType="int">
+        select count(*) from forum
+    </select>
+
+    <select id="searchForums" resultMap="BaseResultMap">
+        SELECT f.forum_id,tp.forum_type_id,tp.forum_type_name,f.user_id,f.publish_date,
+            f.title,f.content,u.nickname
+            FROM forum f
+            LEFT OUTER JOIN forum_type tp
+            ON f.forum_type_id = tp.forum_type_id
+            LEFT OUTER JOIN USER u
+            ON u.user_id = f.user_id
+    </select>
+
+    <delete id="deleteForums">
+        delete from forum where forum_id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="getLabels" resultMap="rm">
+        select * from forum_type where forum_type_status = 1
+    </select>
+
+    <update id="changeLabelStatus" parameterType="int">
+        update forum_type set forum_type_status = 0 where forum_type_id = #{labelId}
+    </update>
+
+    <insert id="addLabel" parameterType="string">
+        insert into forum_type values (null,#{labelName},1)
+    </insert>
+</mapper>

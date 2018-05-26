@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xupt.dao_admin.AdminAmlCommentDao">
+    <resultMap type="AdminAmlComment" id="BaseResultMap">
+        <id column="ml_comment_id" jdbcType="INTEGER" property="ml_comment_id"/>
+        <result column="comment_id" jdbcType="INTEGER" property="comment_id"/>
+        <result column="nickname1" jdbcType="VARCHAR" property="user_one"/>
+        <result column="nickname2" jdbcType="VARCHAR" property="user_two"/>
+        <result column="aml_comment_date" jdbcType="VARCHAR" property="aml_comment_date"/>
+        <result column="aml_content" jdbcType="VARCHAR" property="aml_content"/>
+    </resultMap>
+
+    <select id="getMoreLevelComment" parameterType="int" resultMap="BaseResultMap">
+        SELECT
+            r.ml_comment_id,u.comment_id,r.aml_comment_date,p1.nickname nickname1,
+            p2.nickname nickname2,r.aml_content
+            FROM article_comment u
+            RIGHT JOIN aml_comment r ON u.comment_id=r.comment_id
+            LEFT JOIN USER p1 ON p1.user_id=r.user_one
+            LEFT JOIN USER p2 ON p2.user_id=r.user_two
+            WHERE u.article_id = #{articleId}
+    </select>
+
+    <delete id="deleteMoreLevelComment" parameterType="int">
+       DELETE FROM aml_comment WHERE ml_comment_id = #{commentId}
+    </delete>
+</mapper>

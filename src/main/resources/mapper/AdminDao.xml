@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xupt.dao_admin.AdminDao">
+    <!--结果映射-->
+    <resultMap id="BaseResultMap" type="Admin">
+        <id property="admin_id" jdbcType="INTEGER" column="admin_id"/>
+        <result property="account" jdbcType="VARCHAR" column="account"/>
+        <result property="password" jdbcType="VARCHAR" column="password"/>
+        <result property="nickname" jdbcType="VARCHAR" column="nickname"/>
+    </resultMap>
+
+    <select id="login" resultMap="BaseResultMap">
+        select * from admin where account = #{account} and password = #{password}
+    </select>
+</mapper>

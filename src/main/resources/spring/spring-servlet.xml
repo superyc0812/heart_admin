@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/aop
+      	http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- 配置完成以后，就会自动的将该包进行扫描，然后将其类中所有注解的类都通过bean的形式注入进来 -->
+    <context:component-scan base-package="com.xupt"></context:component-scan>
+
+    <!-- 开启切面编程自动代理 -->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+
+    <!--配置spring写好的JSON消息转换器-->
+    <bean id="jsonConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"></bean>
+
+    <!--配置处理器映射和适配器映射-->
+    <mvc:annotation-driven>
+        <mvc:message-converters>	<!-- 将这个消息转换器注册到这个处理器适配器当中，处理器适配器会根据用户的所需要的数据格式，会将程序中的java对象转换为json格式的数据，返回给客户端 -->
+            <ref bean="jsonConverter"/>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <!--访问静态资源-->
+    <mvc:default-servlet-handler/>
+
+    <!--配置多部分表单解析器-->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxInMemorySize" value="52428800"></property><!-- 设置最大一次文件大小 ，超过了就会自动的放在此磁盘上处理-->
+        <property name="maxUploadSize" value="52428800"></property>	<!-- 设置文件一次性上传的总大小 （50M）-->
+        <property name="defaultEncoding" value="utf-8"></property>	<!-- 设置文件的默认编码格式  -->
+    </bean>
+
+    <!--配置SpringMVC的内部试图解析器-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/"></property>
+        <property name="suffix" value=".jsp"></property>
+        <property name="order" value="100"></property>
+    </bean>
+</beans>

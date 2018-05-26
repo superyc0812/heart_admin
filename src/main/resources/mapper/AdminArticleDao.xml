@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xupt.dao_admin.AdminArticleDao">
+    <resultMap type="AdminArticle" id="BaseResultMap">
+        <id column="article_id" jdbcType="INTEGER" property="article_id"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="upload_date" jdbcType="VARCHAR" property="upload_date"/>
+        <result column="article_type_id" jdbcType="INTEGER" property="typeId"/>
+        <result column="author" jdbcType="VARCHAR" property="author"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="content" jdbcType="VARCHAR" property="content"/>
+        <result column="read_num" jdbcType="INTEGER" property="read_num"/>
+        <result column="picture_addr" jdbcType="VARCHAR" property="picture_addr"/>
+    </resultMap>
+
+    <resultMap type="AdminArticle2" id="BaseResultMap2">
+        <id column="article_id" jdbcType="INTEGER" property="article_id"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="upload_date" jdbcType="VARCHAR" property="upload_date"/>
+        <result column="article_type_id" jdbcType="INTEGER" property="typeId"/>
+        <result column="article_type_name" jdbcType="VARCHAR" property="typeName"/>
+        <result column="author" jdbcType="VARCHAR" property="author"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="content" jdbcType="VARCHAR" property="content"/>
+        <result column="read_num" jdbcType="INTEGER" property="read_num"/>
+        <result column="picture_addr" jdbcType="VARCHAR" property="picture_addr"/>
+    </resultMap>
+
+    <resultMap type="AdminArticleType" id="rm">
+        <id column="article_type_id" jdbcType="INTEGER" property="article_type_id"/>
+        <result column="article_type_name" jdbcType="VARCHAR" property="article_type_name"/>
+        <result column="article_type_status" jdbcType="BOOLEAN" property="article_type_status"/>
+    </resultMap>
+
+    <select id="getLabels" resultMap="rm">
+        select * from article_type where article_type_status = 1
+    </select>
+
+    <update id="changeLabelStatus" parameterType="int">
+        update article_type set article_type_status = 0 where article_type_id = #{labelId}
+    </update>
+
+    <insert id="addLable" parameterType="string">
+        insert into article_type values (null,#{lableName},1)
+    </insert>
+
+    <select id="getArticleList" parameterType="AdminPageBean" resultMap="BaseResultMap2">
+        SELECT a.article_id,a.title,a.upload_date,tp.article_type_id,tp.article_type_name,a.author,a.description,
+            a.content,a.read_num,a.picture_addr
+            FROM article a
+            LEFT OUTER JOIN article_type tp
+            ON a.article_type_id = tp.article_type_id
+        <if test="start!=null and pageSize!=null">
+            limit #{start},#{pageSize}
+        </if>
+    </select>
+
+    <select id="getTotalArticles" resultType="int">
+        select count(*) from article
+    </select>
+
+    <select id="getArticleById" parameterType="int" resultMap="BaseResultMap">
+        select * from article where article_id = #{articleId}
+    </select>
+
+    <insert id="addArticle" parameterType="AdminArticle3">
+        /*insert语句之后再执行，将其插入的自增主键设置到article_id属性中*/
+        <selectKey keyProperty="article_id" order="AFTER" resultType="java.lang.Integer">
+            SELECT LAST_INSERT_ID()   /*得到刚insert到数据表中的记录的主键值，只适用于自增主键 */
+        </selectKey>
+        insert into article values (null,#{title},#{upload_date},#{typeId},#{author},#{description},#{content},1,#{picture_addr},#{keywords})
+    </insert>
+
+    <update id="editArticle" parameterType="AdminArticle">
+        update article
+        <set>
+            <if test="title!=null and title!=''">
+                title=#{title},
+            </if>
+            <if test="upload_date!=null and upload_date!=''">
+                upload_date=#{upload_date},
+            </if>
+            <if test="typeId!=0">
+                article_type_id=#{typeId},
+            </if>
+            <if test="author!=null and author!=''">
+                author=#{author},
+            </if>
+            <if test="description!=null and description!=''">
+                description=#{description},
+            </if>
+            <if test="content!=null and content!=''">
+                content=#{content},
+            </if>
+            <if test="picture_addr!=null and picture_addr!=''">
+                picture_addr=#{picture_addr},
+            </if>
+        </set>
+        where article_id=#{article_id}
+    </update>
+
+    <delete id="deleteArticles">
+        delete from article where article_id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="searchArticles" resultMap="BaseResultMap2">
+         SELECT a.article_id,a.title,a.upload_date,tp.article_type_id,tp.article_type_name,a.author,a.description,
+            a.content,a.read_num,a.picture_addr
+            FROM article a
+            LEFT OUTER JOIN article_type tp
+            ON a.article_type_id = tp.article_type_id
+    </select>
+</mapper>

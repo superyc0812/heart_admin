@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xupt.dao_admin.AdminMusicDao">
+    <resultMap type="AdminMusic" id="BaseResultMap">
+        <id column="music_id" jdbcType="INTEGER" property="music_id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="musician" jdbcType="VARCHAR" property="musician"/>
+        <result column="upload_date" jdbcType="VARCHAR" property="upload_date"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="music_type_id" jdbcType="INTEGER" property="typeId"/>
+        <result column="music_type_name" jdbcType="VARCHAR" property="typeName"/>
+        <result column="play_num" jdbcType="INTEGER" property="play_num"/>
+        <result column="img_addr" jdbcType="VARCHAR" property="img_addr"/>
+        <result column="save_addr" jdbcType="VARCHAR" property="save_addr"/>
+    </resultMap>
+
+    <resultMap type="AdminMusic2" id="BaseResultMap2">
+        <id column="music_id" jdbcType="INTEGER" property="music_id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="musician" jdbcType="VARCHAR" property="musician"/>
+        <result column="upload_date" jdbcType="VARCHAR" property="upload_date"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="music_type_id" jdbcType="INTEGER" property="typeId"/>
+        <result column="play_num" jdbcType="INTEGER" property="play_num"/>
+        <result column="img_addr" jdbcType="VARCHAR" property="img_addr"/>
+        <result column="save_addr" jdbcType="VARCHAR" property="save_addr"/>
+    </resultMap>
+
+    <resultMap type="AdminMusicType" id="rm">
+        <id column="music_type_id" jdbcType="INTEGER" property="music_label_id"/>
+        <result column="music_type_name" jdbcType="VARCHAR" property="music_label_name"/>
+        <result column="music_type_status" jdbcType="BOOLEAN" property="music_label_status"/>
+    </resultMap>
+
+    <select id="getMusicList" parameterType="AdminPageBean" resultMap="BaseResultMap">
+        SELECT m.music_id,tp.music_type_id,tp.music_type_name,m.name,m.musician,m.upload_date,
+        m.description,m.play_num,m.img_addr,m.save_addr
+            FROM music m
+            LEFT OUTER JOIN music_type tp
+            ON m.music_type_id = tp.music_type_id
+        <if test="start!=null and pageSize!=null">
+            limit #{start},#{pageSize}
+        </if>
+    </select>
+
+    <select id="getTotalMusics" resultType="int">
+        select count(*) from music
+    </select>
+
+    <select id="getMusicById" parameterType="int" resultMap="BaseResultMap2">
+        select * from music where music_id = #{musicId}
+    </select>
+
+    <select id="getLabels" resultMap="rm">
+        select * from music_type where music_type_status = 1
+    </select>
+
+    <insert id="addMusic" parameterType="AdminMusic3">
+        /*insert语句之后再执行，将其插入的自增主键设置到article_id属性中*/
+        <selectKey keyProperty="music_id" order="AFTER" resultType="java.lang.Integer">
+            SELECT LAST_INSERT_ID()   /*得到刚insert到数据表中的记录的主键值，只适用于自增主键 */
+        </selectKey>
+        insert into music values (null,#{typeId},#{name},#{musician},#{upload_date},#{description},1,#{img_addr},#{save_addr},#{keywords})
+    </insert>
+
+    <update id="editMusic" parameterType="AdminMusic2">
+        update music
+        <set>
+            <if test="typeId!=0">
+                music_type_id=#{typeId},
+            </if>
+            <if test="name!=null and name!=''">
+                name=#{name},
+            </if>
+            <if test="musician!=null and musician!=''">
+                musician=#{musician},
+            </if>
+            <if test="upload_date!=null and upload_date!=''">
+                upload_date=#{upload_date},
+            </if>
+            <if test="description!=null and description!=''">
+                description=#{description},
+            </if>
+            <if test="img_addr!=null and img_addr!=''">
+                img_addr=#{img_addr},
+            </if>
+            <if test="save_addr!=null and save_addr!=''">
+                save_addr=#{save_addr},
+            </if>
+        </set>
+        where music_id=#{music_id}
+    </update>
+
+    <select id="searchMusics" resultMap="BaseResultMap">
+        SELECT m.music_id,tp.music_type_id,tp.music_type_name,m.name,m.musician,m.upload_date,
+        m.description,m.play_num,m.img_addr,m.save_addr
+            FROM music m
+            LEFT OUTER JOIN music_type tp
+            ON m.music_type_id = tp.music_type_id
+    </select>
+
+    <delete id="deleteMusics">
+        delete from music where music_id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <update id="changeLabelStatus" parameterType="int">
+         update music_type set music_type_status = 0 where music_type_id = #{labelId}
+    </update>
+
+    <insert id="addLabel" parameterType="string">
+        insert into music_type values (null,#{labelName},1)
+    </insert>
+</mapper>

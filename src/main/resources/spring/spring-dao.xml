@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    	 http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://www.springframework.org/schema/tx
+         http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--配置数据库连接池-->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+        <property name="url" value="jdbc:mysql://localhost:3306/heart_website"></property>
+        <property name="username" value="root"></property>
+        <property name="password" value="root"></property>
+        <property name="maxActive" value="20"></property>
+        <property name="maxIdle" value="15"></property>
+        <property name="maxWait" value="5000"></property>
+    </bean>
+
+    <!--配置事物管理器-->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!--配置数据源-->
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <!-- 配置基于注解的声明式事务 默认使用注解来管理事务行为 -->
+    <tx:annotation-driven transaction-manager="txManager"/>
+
+    <!--配置SqlSessionFactory，需要配置（数据源、映射的xml文件以及类型别名包）-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--配置数据源-->
+        <property name="dataSource" ref="dataSource"></property>
+        <!-- 配置mybatis全局配置文件：mybastis-config.xml -->
+        <property name="configLocation" value="classpath:mybatis-config.xml"></property>
+        <!--配置类型别名包-->
+        <property name="typeAliasesPackage" value="com.xupt.vo_user;com.xupt.vo_admin"></property>
+        <!--配置映射接口文件对应的xml文件-->
+        <property name="mapperLocations">
+            <value>classpath:mapper/*Dao.xml</value>
+        </property>
+    </bean>
+
+    <!--配置实现dao接口的所有bean实例-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--配置sqlSessionFactory-->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+        <!--配置映射的接口-->
+        <property name="basePackage" value="com.xupt.dao_*"></property>
+    </bean>
+</beans>

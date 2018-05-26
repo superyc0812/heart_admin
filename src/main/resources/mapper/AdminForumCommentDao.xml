@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xupt.dao_admin.AdminForumCommentDao">
+    <resultMap type="AdminForumComment" id="BaseResultMap">
+        <id column="comment_id" jdbcType="INTEGER" property="comment_id"/>
+        <result column="comment_date" jdbcType="VARCHAR" property="comment_date"/>
+        <result column="nickname" jdbcType="VARCHAR" property="user_name"/>
+        <result column="content" jdbcType="VARCHAR" property="content"/>
+    </resultMap>
+
+    <select id="getFirstLevelComment" parameterType="int" resultMap="BaseResultMap">
+        SELECT
+            f.comment_id,f.comment_date,f.content,u.nickname
+            FROM forum_comment f
+            LEFT JOIN USER u ON u.user_id = f.user_id
+            WHERE f.forum_id = #{forumId}
+    </select>
+
+    <delete id="deleteFirstLevelComment" parameterType="int">
+         DELETE FROM forum_comment WHERE comment_id = #{commentId}
+    </delete>
+</mapper>

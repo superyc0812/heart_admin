@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xupt.dao_admin.AdminUserDao">
+    <!--结果映射-->
+    <resultMap type="AdminUser" id="BaseResultMap">
+        <id column="user_id" jdbcType="INTEGER" property="user_id"/>
+        <result column="account" jdbcType="VARCHAR" property="account"/>
+        <result column="nickname" jdbcType="VARCHAR" property="nickname"/>
+        <result column="sex" jdbcType="INTEGER" property="sex"/>
+        <result column="birthday" jdbcType="VARCHAR" property="birthday"/>
+        <result column="signature" jdbcType="VARCHAR" property="signature"/>
+    </resultMap>
+
+    <select id="getUsers" parameterType="AdminPageBean" resultMap="BaseResultMap">
+        select * from user
+        <if test="start!=null and pageSize!=null">
+            limit #{start},#{pageSize}
+        </if>
+    </select>
+
+    <select id="searchUser" resultMap="BaseResultMap">
+        SELECT * FROM USER
+    </select>
+</mapper>

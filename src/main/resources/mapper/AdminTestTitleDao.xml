@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xupt.dao_admin.AdminTestTitleDao">
+    <resultMap type="AdminTestTitle" id="BaseResultMap">
+        <id column="title_id" jdbcType="INTEGER" property="title_id"/>
+        <result column="test_id" jdbcType="INTEGER" property="test_id"/>
+        <result column="title_name" jdbcType="VARCHAR" property="title_name"/>
+        <result column="choose_one" jdbcType="VARCHAR" property="choose_one"/>
+        <result column="choose_two" jdbcType="VARCHAR" property="choose_two"/>
+        <result column="choose_three" jdbcType="VARCHAR" property="choose_three"/>
+        <result column="choose_four" jdbcType="VARCHAR" property="choose_four"/>
+    </resultMap>
+
+    <!-- 为dao接口方法提供sql语句设置 -->
+    <select id="getQuestions" resultMap="BaseResultMap">
+        select * from test_title where test_id=#{testId}
+    </select>
+
+    <delete id="deleteTestQuestions">
+        delete from test_title where title_id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <insert id="addQuestions" parameterType="AdminTestTitle">
+        insert into test_title values(null,#{test_id},#{title_name},#{choose_one},#{choose_two},#{choose_three},#{choose_four})
+    </insert>
+
+    <update id="editQuestions" parameterType="AdminTestTitle">
+        update test_title
+        <set>
+            <if test="test_id!=null">
+                test_id=#{test_id},
+            </if>
+            <if test="title_name!=null and title_name!=''">
+                title_name=#{title_name},
+            </if>
+            <if test="choose_one!=null and choose_one!=''">
+                choose_one=#{choose_one},
+            </if>
+            <if test="choose_two!=null and choose_two!=''">
+                choose_two=#{choose_two},
+            </if>
+            <if test="choose_three!=null and choose_three!=''">
+                choose_three=#{choose_three},
+            </if>
+            <if test="choose_four!=null and choose_four!=''">
+                choose_four=#{choose_four},
+            </if>
+        </set>
+        where title_id=#{title_id}
+    </update>
+</mapper>

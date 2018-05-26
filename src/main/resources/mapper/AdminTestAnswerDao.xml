@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xupt.dao_admin.AdminTestAnswerDao">
+    <resultMap type="AdminTestAnswer" id="BaseResultMap">
+        <id column="answer_id" jdbcType="INTEGER" property="answer_id"/>
+        <result column="test_id" jdbcType="INTEGER" property="test_id"/>
+        <result column="region_one" jdbcType="VARCHAR" property="region_one"/>
+        <result column="region_two" jdbcType="VARCHAR" property="region_two"/>
+        <result column="region_three" jdbcType="VARCHAR" property="region_three"/>
+    </resultMap>
+
+    <!-- 为dao接口方法提供sql语句设置 -->
+    <select id="getAnswer" parameterType="int" resultMap="BaseResultMap">
+        select * from test_answer where test_id = #{testId}
+    </select>
+
+    <update id="editAnswer" parameterType="AdminTestAnswer">
+        update test_answer
+        <set>
+            <if test="region_one!=null and region_one!=''">
+                region_one=#{region_one},
+            </if>
+            <if test="region_two!=null and region_two!=''">
+                region_two=#{region_two},
+            </if>
+            <if test="region_three!=null and region_three!=''">
+                region_three=#{region_three},
+            </if>
+        </set>
+        where test_id=#{test_id}
+    </update>
+
+    <insert id="addAnswer" parameterType="AdminAnswer">
+        insert into test_answer values(null,#{test_id},#{region_one},#{region_two},#{region_three})
+    </insert>
+</mapper>

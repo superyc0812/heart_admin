@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="heart_admin:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="heart_website.war">
+      <element id="artifact" artifact-name="heart_admin:war exploded" />
+    </root>
+  </artifact>
+</component>
